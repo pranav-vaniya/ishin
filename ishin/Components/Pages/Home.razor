@@ -1,0 +1,28 @@
+﻿@page "/"
+
+@if (showSplashScreen == true)
+{
+	<Splash></Splash>
+}
+else
+{
+	<h1>Hello, world!</h1>
+
+	<h6>Welcome to your new app. :)</h6>
+}
+
+@code {
+	bool showSplashScreen = true;
+
+	protected override async Task OnInitializedAsync()
+	{
+		_ = HideSplashScreen();
+	}
+
+	async Task HideSplashScreen()
+	{
+		await Task.Delay(3500);
+		showSplashScreen = false;
+		StateHasChanged();
+	}
+}
