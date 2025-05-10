@@ -1,4 +1,6 @@
 ﻿:root {
+    --default-background-color: #222831;
+    --default-text-color: #DFD0B8;
     --default-font-family: "Poppins";
     --title-font-family: "Outfit";
     --childlike-font-family: "Shadows Into Light Two";
@@ -9,6 +11,14 @@
 
 * {
     font-family: var(--default-font-family);
+}
+
+.default-text-color {
+    color: var(--default-text-color);
+}
+
+.default-background-color {
+    background-color: var(--default-background-color);
 }
 
 #blazor-error-ui {
@@ -80,16 +90,16 @@
 
     #splash-screen-center-div svg path {
         fill: transparent;
-        stroke: black;
+        stroke: #DFD0B8;
         stroke-width: 0.05rem;
-        stroke-dasharray: 150;
-        stroke-dashoffset: 150;
-        animation: textAnimation 3s ease-in-out 1 forwards;
+        stroke-dasharray: 200;
+        stroke-dashoffset: 200;
+        animation: textAnimation 4s ease-in-out 1 forwards;
     }
 
 @keyframes textAnimation {
     0% {
-        stroke-dashoffset: 150;
+        stroke-dashoffset: 200;
     }
 
     80% {
@@ -98,6 +108,6 @@
 
     100% {
         stroke-dashoffset: 0;
-        fill: black;
+        fill: #DFD0B8;
     }
 }

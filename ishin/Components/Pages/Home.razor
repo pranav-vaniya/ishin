@@ -6,9 +6,9 @@
 }
 else
 {
-	<h1>Hello, world!</h1>
-
-	<h6>Welcome to your new app. :)</h6>
+	<MudText Typo="Typo.h1" Class="default-text-color">ishin</MudText>
+	<MudText Typo="Typo.h6" Class="default-text-color">Welcome to ishin</MudText>
+	<MudText Typo="Typo.body1" Class="default-text-color">This is some body text</MudText>
 }
 
 @code {
@@ -21,7 +21,7 @@ else
 
 	async Task HideSplashScreen()
 	{
-		await Task.Delay(3500);
+		await Task.Delay(4500);
 		showSplashScreen = false;
 		StateHasChanged();
 	}
