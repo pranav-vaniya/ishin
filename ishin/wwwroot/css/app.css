@@ -30,6 +30,10 @@
     font-family: var(--title-font-family) !important;
 }
 
+.childlike-font-family {
+    font-family: var(--childlike-font-family) !important;
+}
+
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;

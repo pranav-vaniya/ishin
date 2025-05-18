@@ -13,9 +13,11 @@ else
 		<MudPaper Elevation="0" Class="px-2 rounded-0 default-background-color">
 			<MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center">
 				<MudText Typo="Typo.h5" Class="default-text-color title-font-family">ishin</MudText>
-				
+
 				<MudIconButton Icon="@Icons.Material.Filled.MoreVert" OnClick="ToggleIsMenuVisible" Class="default-text-color"></MudIconButton>
-				<MudAvatar Color="Color.Tertiary" Size="Size.Small" @onclick="ToggleIsProfileVisible">D</MudAvatar>
+				<MudAvatar Size="Size.Small" @onclick="ToggleIsProfileVisible">
+					<MudImage Src="images/ishin.jpg"></MudImage>
+				</MudAvatar>
 			</MudStack>
 
 			@if (isProfileVisible)
