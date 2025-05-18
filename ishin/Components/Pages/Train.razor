@@ -1,0 +1,105 @@
+﻿@page "/train"
+@inject NavigationManager navigationManager
+
+<MudPaper Elevation="0" Class="px-2 rounded-0 default-background-color">
+	<MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center">
+		<MudText Typo="Typo.h5" Class="default-text-color title-font-family">ishin</MudText>
+
+		<MudIconButton Icon="@Icons.Material.Filled.MoreVert" OnClick="ToggleIsMenuVisible" Class="default-text-color"></MudIconButton>
+		<MudAvatar Color="Color.Tertiary" Size="Size.Small" @onclick="ToggleIsProfileVisible">D</MudAvatar>
+	</MudStack>
+
+	@if (isProfileVisible)
+	{
+		<Profile></Profile>
+	}
+
+	@if (isMenuVisible)
+	{
+		<MudPaper Elevation="0" Class="border default-background-color pa-2 mb-4">
+			<MudButton OnClick="NavigateToChatPage" StartIcon="@Icons.Material.Filled.Chat" FullWidth Class="default-text-color">Chat</MudButton>
+			<MudButton Href="https://github.com/pranav-vaniya/ishin" StartIcon="@Icons.Custom.Brands.GitHub" FullWidth Class="default-text-color">Project Source</MudButton>
+			<MudButton OnClick="ToggleIsMenuVisible" StartIcon="@Icons.Material.Filled.Close" FullWidth Class="default-text-color">Close Menu</MudButton>
+		</MudPaper>
+	}
+</MudPaper>
+
+<MudPaper Elevation="0" Class="pa-2 default-background-color">
+
+	<MudText Typo="Typo.body1" Class="default-text-color mb-2">
+		Select text files that you would like to use for training the model:
+	</MudText>
+
+	<MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept="text/plain" FilesChanged="UploadFiles">
+		<ActivatorContent>
+			<MudButton DropShadow Class="default-text-color" Variant="Variant.Outlined" FullWidth StartIcon="@Icons.Material.Filled.Folder">
+				Select Files
+			</MudButton>
+		</ActivatorContent>
+	</MudFileUpload>
+
+	@if (uploadedFiles != null)
+	{
+		<MudList T="string" Class="px-4 py-2 mb-2">
+			@foreach (var file in uploadedFiles)
+			{
+				<MudListItem Icon="@Icons.Custom.FileFormats.FileDocument" IconColor="Color.Tertiary" Dense=true>
+					<MudText Typo="Typo.body2" Class="default-text-color">
+						@file.Name <small style="color: aquamarine;">@((file.Size / 1000) + 1) kB</small>
+					</MudText>
+				</MudListItem>
+			}
+		</MudList>
+	}
+
+	<MudText Typo="Typo.body1" Class="default-text-color">N Grams:</MudText>
+	<MudSelect @bind-Value="ngrams" Placeholder="N Grams" Underline=false Class="mb-2">
+		@for (int i = 2; i <= 10; i++)
+		{
+			var num = i;
+			<MudSelectItem Value="@num" Class="default-font-color default-background-color">@num</MudSelectItem>
+		}
+	</MudSelect>
+
+	<MudCheckBox @bind-Value="shouldTurnAllCharactersToLowerCase" Color="Color.Tertiary" Dense Class="default-text-color mb-2">Transform all characters to lowercase</MudCheckBox>
+
+	<MudText Typo="Typo.body1" Class="default-text-color">Allowed Characters:</MudText>
+	<MudCheckBox @bind-Value="areAlphabetsAllowed" Color="Color.Tertiary" Dense Class="default-text-color">Alphabets</MudCheckBox>
+	<MudCheckBox @bind-Value="areIntegersAllowed" Color="Color.Tertiary" Dense Class="default-text-color">Integers</MudCheckBox>
+	<MudCheckBox @bind-Value="areFullStopsAllowed" Color="Color.Tertiary" Dense Class="default-text-color">Full Stops</MudCheckBox>
+	<MudCheckBox @bind-Value="areSpecialCharactersAllowed" Color="Color.Tertiary" Dense Class="default-text-color mb-4">Special Characters</MudCheckBox>
+
+	<MudButton FullWidth Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Start" Class="default-text-color">Start Training</MudButton>
+</MudPaper>
+
+@code {
+	bool isMenuVisible = false, isProfileVisible = false, shouldTurnAllCharactersToLowerCase = true;
+	IList<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
+	int ngrams = 3;
+	bool areAlphabetsAllowed = true, areIntegersAllowed = false, areFullStopsAllowed = true, areSpecialCharactersAllowed = false;
+
+	private void UploadFiles(IReadOnlyList<IBrowserFile> files)
+	{
+		uploadedFiles = new List<IBrowserFile>();
+
+		foreach (var file in files)
+		{
+			this.uploadedFiles.Add(file);
+		}
+	}
+
+	private void NavigateToChatPage()
+	{
+		navigationManager.NavigateTo("/", forceLoad: true);
+	}
+
+	private void ToggleIsMenuVisible()
+	{
+		isMenuVisible = !isMenuVisible;
+	}
+
+	private void ToggleIsProfileVisible()
+	{
+		isProfileVisible = !isProfileVisible;
+	}
+}

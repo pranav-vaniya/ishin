@@ -1,5 +1,6 @@
 ﻿:root {
     --default-background-color: #222831;
+    --default-background-secondary-color: #393E46;
     --default-text-color: #DFD0B8;
     --default-font-family: "Poppins";
     --title-font-family: "Outfit";
@@ -10,15 +11,23 @@
 /* global */
 
 * {
-    font-family: var(--default-font-family);
+    font-family: var(--default-font-family) !important;
 }
 
 .default-text-color {
-    color: var(--default-text-color);
+    color: var(--default-text-color) !important;
 }
 
 .default-background-color {
-    background-color: var(--default-background-color);
+    background-color: var(--default-background-color) !important;
+}
+
+.default-background-secondary-color {
+    background-color: var(--default-background-secondary-color) !important;
+}
+
+.title-font-family {
+    font-family: var(--title-font-family) !important;
 }
 
 #blazor-error-ui {
@@ -76,7 +85,7 @@
     bottom: 0;
     transform: translateX(-50%);
     margin-bottom: 2rem;
-    font-family: var(--childlike-font-family);
+    font-family: var(--childlike-font-family) !important;
     font-size: 1rem;
     font-weight: 100;
 }
@@ -110,4 +119,17 @@
         stroke-dashoffset: 0;
         fill: #DFD0B8;
     }
+}
+
+.hidden-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hidden-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.text-align-left {
+    text-align: left !important;
 }

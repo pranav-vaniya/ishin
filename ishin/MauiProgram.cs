@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using ishin.Services;
+using Microsoft.Extensions.Logging;
 using MudBlazor.Services;
 
 namespace ishin
@@ -17,10 +18,11 @@ namespace ishin
 
             builder.Services.AddMauiBlazorWebView();
             builder.Services.AddMudServices();
+            builder.Services.AddScoped<IshinService>();
 
 #if DEBUG
-    		builder.Services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            builder.Services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

@@ -1,4 +1,7 @@
 ﻿@page "/"
+@inject IshinService ishinService
+@inject IJSRuntime jSRuntime
+@inject NavigationManager navigationManager
 
 @if (showSplashScreen == true)
 {
@@ -6,17 +9,104 @@
 }
 else
 {
-	<MudText Typo="Typo.h1" Class="default-text-color">ishin</MudText>
-	<MudText Typo="Typo.h6" Class="default-text-color">Welcome to ishin</MudText>
-	<MudText Typo="Typo.body1" Class="default-text-color">This is some body text</MudText>
+	<MudStack Spacing="0" StretchItems="StretchItems.Middle" Style="height: 100vh;">
+		<MudPaper Elevation="0" Class="px-2 rounded-0 default-background-color">
+			<MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center">
+				<MudText Typo="Typo.h5" Class="default-text-color title-font-family">ishin</MudText>
+				
+				<MudIconButton Icon="@Icons.Material.Filled.MoreVert" OnClick="ToggleIsMenuVisible" Class="default-text-color"></MudIconButton>
+				<MudAvatar Color="Color.Tertiary" Size="Size.Small" @onclick="ToggleIsProfileVisible">D</MudAvatar>
+			</MudStack>
+
+			@if (isProfileVisible)
+			{
+				<Profile></Profile>
+			}
+
+			@if (isMenuVisible)
+			{
+				<MudPaper Elevation="0" Class="border default-background-color pa-2 mb-4">
+					<MudButton OnClick="NavigateToTrainPage" StartIcon="@Icons.Material.Filled.ModelTraining" FullWidth Class="default-text-color">Train Your Own Model</MudButton>
+					<MudButton Href="https://github.com/pranav-vaniya/ishin" StartIcon="@Icons.Custom.Brands.GitHub" FullWidth Class="default-text-color">Project Source</MudButton>
+					<MudButton OnClick="ToggleIsMenuVisible" StartIcon="@Icons.Material.Filled.Close" FullWidth Class="default-text-color">Close Menu</MudButton>
+				</MudPaper>
+			}
+		</MudPaper>
+
+		<MudPaper Elevation="0" Class="px-2 overflow-x-scroll rounded-0 default-background-color hidden-scrollbar">
+			@if (conversation.Messages.Count == 0)
+			{
+				<MudPaper Elevation="0" Class="default-background-color d-flex justify-center align-center" Style="height: 100%">
+					<MudPaper Elevation="0" Class="default-background-color">
+						<MudText Typo="Typo.h4" Align="Align.Center" Class="default-text-color title-font-family">ishin</MudText>
+						<MudText Typo="Typo.body2" Align="Align.Center" Class="default-text-color">send a message to get started</MudText>
+					</MudPaper>
+				</MudPaper>
+			}
+			else
+			{
+				@foreach (ConversationMessage message in conversation.Messages)
+				{
+					ChatBubblePosition chatBubblePosition = message.Sender == User.Ishin ? ChatBubblePosition.Start : ChatBubblePosition.End;
+					string userInitial = message.Sender == User.Ishin ? "I" : "A";
+
+					<MudChat ChatPosition="@chatBubblePosition">
+						<MudAvatar Size="Size.Small">@userInitial</MudAvatar>
+						<MudChatBubble Class="default-text-color default-background-secondary-color text-align-left" Style="max-width: 80%;">
+							@message.Content
+						</MudChatBubble>
+					</MudChat>
+				}
+			}
+
+			<div id="bottom-of-the-chat-screen"></div>
+		</MudPaper>
+
+		<MudPaper Elevation="0" Class="px-2 rounded-0 default-background-color">
+			<MudTextField @bind-Value="userInputText" Adornment="Adornment.End" AdornmentIcon="@Icons.Material.Filled.Send" Variant="Variant.Text" AutoGrow Underline=false AdornmentColor="Color.Tertiary" Placeholder="Ask Anything" Margin="Margin.Dense" Class="default-text-color my-2" OnAdornmentClick="AddMessageToConversation" Immediate></MudTextField>
+		</MudPaper>
+	</MudStack>
 }
 
 @code {
 	bool showSplashScreen = true;
+	bool isMenuVisible = false, isProfileVisible = false;
+	Conversation conversation = new();
+	string userInputText = string.Empty;
+
+	private async Task AddMessageToConversation()
+	{
+		conversation.Messages.Add(new ConversationMessage
+			{
+				Sender = User.Atlas,
+				Content = userInputText
+			}
+		);
+
+		userInputText = string.Empty;
+		StateHasChanged();
+		await ScrollToBottom();
+
+		conversation.Messages.Add(new ConversationMessage
+			{
+				Sender = User.Ishin,
+				Content = "Response from Ishin"
+			}
+		);
+
+		StateHasChanged();
+		await ScrollToBottom();
+	}
+
+	private async Task ScrollToBottom()
+	{
+		await jSRuntime.InvokeVoidAsync("scrollToBottomOfChat");
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
 		_ = HideSplashScreen();
+		// conversation = ishinService.GetSampleConversation();
 	}
 
 	async Task HideSplashScreen()
@@ -24,5 +114,20 @@ else
 		await Task.Delay(4500);
 		showSplashScreen = false;
 		StateHasChanged();
+	}
+
+	private void NavigateToTrainPage()
+	{
+		navigationManager.NavigateTo("/train", forceLoad: true);
+	}
+
+	private void ToggleIsMenuVisible()
+	{
+		isMenuVisible = !isMenuVisible;
+	}
+
+	private void ToggleIsProfileVisible()
+	{
+		isProfileVisible = !isProfileVisible;
 	}
 }
