@@ -1,5 +1,7 @@
 ﻿@page "/train"
 @inject NavigationManager navigationManager
+@inject IshinService ishinService
+@inject IJSRuntime jSRuntime
 
 <MudPaper Elevation="0" Class="px-2 rounded-0 default-background-color">
 	<MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center">
@@ -71,7 +73,14 @@
 	<MudCheckBox @bind-Value="areFullStopsAllowed" Color="Color.Tertiary" Dense Class="default-text-color">Full Stops</MudCheckBox>
 	<MudCheckBox @bind-Value="areSpecialCharactersAllowed" Color="Color.Tertiary" Dense Class="default-text-color mb-4">Special Characters</MudCheckBox>
 
-	<MudButton FullWidth Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Start" Class="default-text-color">Start Training</MudButton>
+	<MudButton OnClick="StartTraining" FullWidth Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Start" Class="default-text-color mb-4">Start Training</MudButton>
+
+	@foreach (string log in trainingLogs)
+	{
+		<MudText Typo="Typo.body2" Class="default-text-color">> @log</MudText>
+	}
+
+	<div id="bottom-of-the-chat-screen"></div>
 </MudPaper>
 
 @code {
@@ -79,6 +88,64 @@
 	IList<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
 	int ngrams = 3;
 	bool areAlphabetsAllowed = true, areIntegersAllowed = false, areFullStopsAllowed = true, areSpecialCharactersAllowed = false;
+	List<string> trainingLogs = new();
+	Dictionary<int, string> itos = new();
+	List<List<int>> X = new();
+	List<int> Y = new();
+
+	private async Task StartTraining()
+	{
+		trainingLogs.Clear();
+		itos.Clear();
+		ishinService.ResetIshin();
+
+		if(uploadedFiles.Count == 0)
+		{
+			trainingLogs.Add("Please select atleast one text file to start model training.");
+			return;
+		}
+
+		trainingLogs.Add("Starting Model Training");
+
+		foreach (var file in uploadedFiles)
+		{
+			trainingLogs.Add("Reading file " + file.Name);
+
+			using var stream = file.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024);
+			using var reader = new StreamReader(stream);
+
+			string? line = await reader.ReadLineAsync();
+			while (line != null)
+			{
+				ishinService.FeedLine(line);
+				line = await reader.ReadLineAsync();
+			}
+		}
+
+		itos = ishinService.GetItoS();
+		trainingLogs.Add($"Created a vocabulary of {itos.Count} words.");
+		trainingLogs.Add($"Created a corpus of {ishinService.GetDataLength()} words.");
+
+		ishinService.CreateXandY(ngrams);
+
+		X = ishinService.GetX();
+		Y = ishinService.GetY();
+
+		trainingLogs.Add($"Created dataset with ngrams = {ngrams}.");
+
+		for (int i = 0; i < 12; i++)
+		{
+			string log = "    ";
+
+			foreach (int num in X[i])
+			{
+				log += num + " ";
+			}
+
+			log += "-> " + Y[i];
+			trainingLogs.Add(log);
+		}
+	}
 
 	private void UploadFiles(IReadOnlyList<IBrowserFile> files)
 	{
@@ -103,5 +170,10 @@
 	private void ToggleIsProfileVisible()
 	{
 		isProfileVisible = !isProfileVisible;
+	}
+
+	private async Task ScrollToBottom()
+	{
+		await jSRuntime.InvokeVoidAsync("scrollToBottomOfChat");
 	}
 }

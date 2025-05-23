@@ -75,6 +75,7 @@ else
 	bool isMenuVisible = false, isProfileVisible = false;
 	Conversation conversation = new();
 	string userInputText = string.Empty;
+	Dictionary<int, string> itos = new();
 
 	private async Task AddMessageToConversation()
 	{
@@ -113,7 +114,7 @@ else
 
 	async Task HideSplashScreen()
 	{
-		await Task.Delay(4500);
+		await Task.Delay(0);
 		showSplashScreen = false;
 		StateHasChanged();
 	}

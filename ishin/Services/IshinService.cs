@@ -1,9 +1,101 @@
-﻿using ishin.Models;
+﻿using System.Text.RegularExpressions;
+using ishin.Models;
 
 namespace ishin.Services
 {
     public class IshinService
     {
+        Dictionary<int, string> itos;
+        int vocabularyCounter;
+        List<int> data, Y;
+        List<List<int>> X;
+        Dictionary<string, Dictionary<int, int>> memory;
+
+        public IshinService()
+        {
+            itos = new();
+            data = new();
+            X = new();
+            Y = new();
+            memory = new();
+        }
+
+        public void FeedLine(string sentence)
+        {
+            sentence = Regex.Replace(sentence.ToLower(), @"[^a-z\s]", "");
+            sentence = Regex.Replace(sentence, @"\s+", " ");
+            sentence = sentence.Trim();
+
+            foreach (string word in sentence.Split(" ").ToList())
+            {
+                if (!itos.ContainsValue(word))
+                {
+                    itos[vocabularyCounter] = word;
+                    vocabularyCounter++;
+                }
+
+                data.Add(itos.FirstOrDefault(x => x.Value == word).Key);
+            }
+        }
+
+        public void CreateXandY(int n)
+        {
+            if (data == null || data.Count < n + 1)
+            {
+                return;
+            }
+
+            for (int i = 0; i <= data.Count - n - 1; i++)
+            {
+                var xSeq = data.GetRange(i, n);
+                var yVal = data[i + n];
+
+                X.Add(xSeq);
+                Y.Add(yVal);
+            }
+        }
+
+        public Dictionary<int, string> GetItoS()
+        {
+            return itos;
+        }
+
+        public List<List<int>> GetX()
+        {
+            return X;
+        }
+
+        public List<int> GetY()
+        {
+            return Y;
+        }
+
+        public int GetDataLength()
+        {
+            return data.Count;
+        }
+
+        public void ResetIshin()
+        {
+            itos.Clear();
+            data.Clear();
+            X.Clear();
+            Y.Clear();
+            memory.Clear();
+            vocabularyCounter = 0;
+        }
+
+        public void ResetXandY()
+        {
+            X.Clear();
+            Y.Clear();
+        }
+
+        public void ResetMemory()
+        {
+            memory.Clear();
+        }
+
         public Conversation GetSampleConversation()
         {
             Conversation sampleConversation = new Conversation
