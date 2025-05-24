@@ -140,7 +140,7 @@
 		ishinService.TrainModel();
 		trainingLogs.Add("Started model training");
 		
-		string savedLocation = ishinService.SaveModelToStorage(modelName);
+		string savedLocation = ishinService.SaveModelToStorage(ngrams, modelName);
 		trainingLogs.Add($"Model saved at {savedLocation}");
 	}
 

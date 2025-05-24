@@ -93,10 +93,12 @@ namespace ishin.Services
             }
         }
 
-        public string SaveModelToStorage(string modelName = "ishin")
+        public string SaveModelToStorage(int ngram, string modelName = "ishin")
         {
             var modelData = new ModelData
             {
+                Name = modelName,
+                NGram = ngram,
                 Itos = itos,
                 TrainedModel = trainedModel
             };
@@ -109,6 +111,34 @@ namespace ishin.Services
             string filePath = Path.Combine(FileSystem.AppDataDirectory, modelName + ".json");
             File.WriteAllText(filePath, json);
             return filePath;
+        }
+
+        public List<ModelData> LoadAllModels()
+        {
+            var models = new List<ModelData>();
+            string directory = FileSystem.AppDataDirectory;
+
+            var jsonFiles = Directory.GetFiles(directory, "*.json");
+
+            foreach (var filePath in jsonFiles)
+            {
+                try
+                {
+                    string json = File.ReadAllText(filePath);
+                    var model = JsonSerializer.Deserialize<ModelData>(json);
+
+                    if (model != null)
+                    {
+                        models.Add(model);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to load {filePath}: {ex.Message}");
+                }
+            }
+
+            return models;
         }
 
         public Dictionary<int, string> GetItoS()

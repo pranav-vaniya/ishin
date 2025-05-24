@@ -36,6 +36,13 @@ else
 		</MudPaper>
 
 		<MudPaper Elevation="0" Class="px-2 overflow-x-scroll rounded-0 default-background-color hidden-scrollbar">
+			@if (models.Count == 0)
+			{
+				<MudText Typo="Typo.body1" Align="Align.Center" Class="default-text-color">
+					You have no trained models. Please train atleast one model to get started.
+				</MudText>
+			}
+
 			@if (conversation.Messages.Count == 0)
 			{
 				<MudPaper Elevation="0" Class="default-background-color d-flex justify-center align-center" Style="height: 100%">
@@ -76,9 +83,15 @@ else
 	Conversation conversation = new();
 	string userInputText = string.Empty;
 	Dictionary<int, string> itos = new();
+	List<ModelData> models = new();
 
 	private async Task AddMessageToConversation()
 	{
+		if (string.IsNullOrWhiteSpace(userInputText))
+		{
+			return;
+		}
+
 		conversation.Messages.Add(new ConversationMessage
 			{
 				Sender = User.Atlas,
@@ -90,10 +103,17 @@ else
 		StateHasChanged();
 		await ScrollToBottom();
 
+		string responseFromIshin = string.Empty;
+
+		if (models.Count == 0)
+		{
+			responseFromIshin = "You have no trained models. Please train atleast one model to get started.";
+		}
+
 		conversation.Messages.Add(new ConversationMessage
 			{
 				Sender = User.Ishin,
-				Content = "Response from Ishin"
+				Content = responseFromIshin
 			}
 		);
 
@@ -110,6 +130,7 @@ else
 	{
 		_ = HideSplashScreen();
 		// conversation = ishinService.GetSampleConversation();
+		models = ishinService.LoadAllModels();
 	}
 
 	async Task HideSplashScreen()
