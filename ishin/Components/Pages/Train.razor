@@ -73,6 +73,8 @@
 	<MudCheckBox @bind-Value="areFullStopsAllowed" Color="Color.Tertiary" Dense Class="default-text-color">Full Stops</MudCheckBox>
 	<MudCheckBox @bind-Value="areSpecialCharactersAllowed" Color="Color.Tertiary" Dense Class="default-text-color mb-4">Special Characters</MudCheckBox>
 
+	<MudTextField @bind-Value="modelName" Variant="Variant.Text" Class="default-text-color mb-4" Underline=false Label="Model Name" Immediate></MudTextField>
+
 	<MudButton OnClick="StartTraining" FullWidth Variant="Variant.Outlined" StartIcon="@Icons.Material.Filled.Start" Class="default-text-color mb-4">Start Training</MudButton>
 
 	@foreach (string log in trainingLogs)
@@ -86,12 +88,13 @@
 @code {
 	bool isMenuVisible = false, isProfileVisible = false, shouldTurnAllCharactersToLowerCase = true;
 	IList<IBrowserFile> uploadedFiles = new List<IBrowserFile>();
-	int ngrams = 3;
-	bool areAlphabetsAllowed = true, areIntegersAllowed = false, areFullStopsAllowed = true, areSpecialCharactersAllowed = false;
+	int ngrams = 2;
+	bool areAlphabetsAllowed = true, areIntegersAllowed = false, areFullStopsAllowed = false, areSpecialCharactersAllowed = false;
 	List<string> trainingLogs = new();
 	Dictionary<int, string> itos = new();
 	List<List<int>> X = new();
 	List<int> Y = new();
+	string modelName = "ishin";
 
 	private async Task StartTraining()
 	{
@@ -99,7 +102,7 @@
 		itos.Clear();
 		ishinService.ResetIshin();
 
-		if(uploadedFiles.Count == 0)
+		if (uploadedFiles.Count == 0)
 		{
 			trainingLogs.Add("Please select atleast one text file to start model training.");
 			return;
@@ -132,19 +135,13 @@
 		Y = ishinService.GetY();
 
 		trainingLogs.Add($"Created dataset with ngrams = {ngrams}.");
+		trainingLogs.Add($"Total records in dataset = {X.Count}");
 
-		for (int i = 0; i < 12; i++)
-		{
-			string log = "    ";
-
-			foreach (int num in X[i])
-			{
-				log += num + " ";
-			}
-
-			log += "-> " + Y[i];
-			trainingLogs.Add(log);
-		}
+		ishinService.TrainModel();
+		trainingLogs.Add("Started model training");
+		
+		string savedLocation = ishinService.SaveModelToStorage(modelName);
+		trainingLogs.Add($"Model saved at {savedLocation}");
 	}
 
 	private void UploadFiles(IReadOnlyList<IBrowserFile> files)

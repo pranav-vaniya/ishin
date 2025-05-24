@@ -1,4 +1,5 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Text.Json;
+using System.Text.RegularExpressions;
 using ishin.Models;
 
 namespace ishin.Services
@@ -10,6 +11,7 @@ namespace ishin.Services
         List<int> data, Y;
         List<List<int>> X;
         Dictionary<string, Dictionary<int, int>> memory;
+        Dictionary<string, List<int>> trainedModel;
 
         public IshinService()
         {
@@ -18,6 +20,7 @@ namespace ishin.Services
             X = new();
             Y = new();
             memory = new();
+            trainedModel = new();
         }
 
         public void FeedLine(string sentence)
@@ -55,6 +58,59 @@ namespace ishin.Services
             }
         }
 
+        public void TrainModel()
+        {
+            for (int i = 0; i < X.Count; i++)
+            {
+                string key = string.Join("-<>-", X[i]);
+
+                if (memory.ContainsKey(key))
+                {
+                    if (memory[key].ContainsKey(Y[i]))
+                    {
+                        memory[key][Y[i]] += 1;
+                    }
+                    else
+                    {
+                        memory[key][Y[i]] = 1;
+                    }
+                }
+                else
+                {
+                    memory[key] = new();
+                    memory[key][Y[i]] = 1;
+                }
+            }
+
+            foreach (var entry in memory)
+            {
+                var sortedY = entry.Value
+                    .OrderByDescending(pair => pair.Value)
+                    .Select(pair => pair.Key)
+                    .ToList();
+
+                trainedModel[entry.Key] = sortedY;
+            }
+        }
+
+        public string SaveModelToStorage(string modelName = "ishin")
+        {
+            var modelData = new ModelData
+            {
+                Itos = itos,
+                TrainedModel = trainedModel
+            };
+
+            string json = JsonSerializer.Serialize(modelData, new JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            string filePath = Path.Combine(FileSystem.AppDataDirectory, modelName + ".json");
+            File.WriteAllText(filePath, json);
+            return filePath;
+        }
+
         public Dictionary<int, string> GetItoS()
         {
             return itos;
@@ -70,9 +126,19 @@ namespace ishin.Services
             return Y;
         }
 
+        public Dictionary<string, Dictionary<int, int>> GetMemory()
+        {
+            return memory;
+        }
+
         public int GetDataLength()
         {
             return data.Count;
+        }
+
+        public Dictionary<string, List<int>> GetTrainedModel()
+        {
+            return trainedModel;
         }
 
         public void ResetIshin()
@@ -82,6 +148,7 @@ namespace ishin.Services
             X.Clear();
             Y.Clear();
             memory.Clear();
+            trainedModel.Clear();
             vocabularyCounter = 0;
         }
 
