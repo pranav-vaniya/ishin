@@ -7,7 +7,7 @@
 	<MudStack Row StretchItems="StretchItems.Start" AlignItems="AlignItems.Center">
 		<MudText Typo="Typo.h5" Class="default-text-color title-font-family">ishin</MudText>
 
-		<MudIconButton Icon="@Icons.Material.Filled.MoreVert" OnClick="ToggleIsMenuVisible" Class="default-text-color"></MudIconButton>
+		<MudIconButton Icon="@Icons.Material.Filled.MoreVert" OnClick="ToggleIsMenuVisible" Class="default-text-color mx-0 px-0"></MudIconButton>
 		<MudAvatar Size="Size.Small" @onclick="ToggleIsProfileVisible">
 			<MudImage Src="images/ishin.jpg"></MudImage>
 		</MudAvatar>
@@ -156,7 +156,7 @@
 
 	private void NavigateToChatPage()
 	{
-		navigationManager.NavigateTo("/", forceLoad: true);
+		navigationManager.NavigateTo("/chat", forceLoad: true);
 	}
 
 	private void ToggleIsMenuVisible()
