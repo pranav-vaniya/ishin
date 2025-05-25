@@ -15,16 +15,16 @@
 
 	@if (isProfileVisible)
 	{
-		<Profile></Profile>
+				<Profile></Profile>
 	}
 
 	@if (isMenuVisible)
 	{
-		<MudPaper Elevation="0" Class="border default-background-color pa-2 mb-4">
-			<MudButton OnClick="NavigateToChatPage" StartIcon="@Icons.Material.Filled.Chat" FullWidth Class="default-text-color">Chat</MudButton>
-			<MudButton Href="https://github.com/pranav-vaniya/ishin" StartIcon="@Icons.Custom.Brands.GitHub" FullWidth Class="default-text-color">Project Source</MudButton>
-			<MudButton OnClick="ToggleIsMenuVisible" StartIcon="@Icons.Material.Filled.Close" FullWidth Class="default-text-color">Close Menu</MudButton>
-		</MudPaper>
+				<MudPaper Elevation="0" Class="border default-background-color pa-2 mb-4">
+					<MudButton OnClick="NavigateToChatPage" StartIcon="@Icons.Material.Filled.Chat" FullWidth Class="default-text-color">Chat</MudButton>
+					<MudButton Href="https://github.com/pranav-vaniya/ishin" StartIcon="@Icons.Custom.Brands.GitHub" FullWidth Class="default-text-color">Project Source</MudButton>
+					<MudButton OnClick="ToggleIsMenuVisible" StartIcon="@Icons.Material.Filled.Close" FullWidth Class="default-text-color">Close Menu</MudButton>
+				</MudPaper>
 	}
 </MudPaper>
 
@@ -44,16 +44,16 @@
 
 	@if (uploadedFiles != null)
 	{
-		<MudList T="string" Class="px-4 py-2 mb-2">
+				<MudList T="string" Class="px-4 py-2 mb-2">
 			@foreach (var file in uploadedFiles)
 			{
-				<MudListItem Icon="@Icons.Custom.FileFormats.FileDocument" IconColor="Color.Tertiary" Dense=true>
-					<MudText Typo="Typo.body2" Class="default-text-color">
+								<MudListItem Icon="@Icons.Custom.FileFormats.FileDocument" IconColor="Color.Tertiary" Dense=true>
+									<MudText Typo="Typo.body2" Class="default-text-color">
 						@file.Name <small style="color: aquamarine;">@((file.Size / 1000) + 1) kB</small>
-					</MudText>
-				</MudListItem>
+									</MudText>
+								</MudListItem>
 			}
-		</MudList>
+				</MudList>
 	}
 
 	<MudText Typo="Typo.body1" Class="default-text-color">N Grams:</MudText>
@@ -61,7 +61,7 @@
 		@for (int i = 2; i <= 10; i++)
 		{
 			var num = i;
-			<MudSelectItem Value="@num" Class="default-font-color default-background-color">@num</MudSelectItem>
+					<MudSelectItem Value="@num" Class="default-font-color default-background-color">@num</MudSelectItem>
 		}
 	</MudSelect>
 
@@ -79,7 +79,7 @@
 
 	@foreach (string log in trainingLogs)
 	{
-		<MudText Typo="Typo.body2" Class="default-text-color">> @log</MudText>
+				<MudText Typo="Typo.body2" Class="default-text-color">> @log</MudText>
 	}
 
 	<div id="bottom-of-the-chat-screen"></div>
@@ -120,7 +120,7 @@
 			string? line = await reader.ReadLineAsync();
 			while (line != null)
 			{
-				ishinService.FeedLine(line);
+				ishinService.FeedLine(line, turnToLowerCase: shouldTurnAllCharactersToLowerCase, areAlphabetsAllowed: areAlphabetsAllowed, areIntegersAllowed: areIntegersAllowed, areFullStopsAllowed: areFullStopsAllowed, areSpecialCharactersAllowed: areSpecialCharactersAllowed);
 				line = await reader.ReadLineAsync();
 			}
 		}
@@ -139,7 +139,7 @@
 
 		ishinService.TrainModel();
 		trainingLogs.Add("Started model training");
-		
+
 		string savedLocation = ishinService.SaveModelToStorage(ngrams, modelName);
 		trainingLogs.Add($"Model saved at {savedLocation}");
 	}

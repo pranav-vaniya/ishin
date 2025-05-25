@@ -23,9 +23,38 @@ namespace ishin.Services
             trainedModel = new();
         }
 
-        public void FeedLine(string sentence)
+        public void FeedLine(string sentence, bool turnToLowerCase = true, bool areAlphabetsAllowed = true, bool areIntegersAllowed = false, bool areFullStopsAllowed = false, bool areSpecialCharactersAllowed = false)
         {
-            sentence = Regex.Replace(sentence.ToLower(), @"[^a-z\s]", "");
+            string allowedChars = string.Empty;
+
+            if (turnToLowerCase)
+            {
+                sentence = sentence.ToLower();
+            }
+
+            if (areAlphabetsAllowed)
+            {
+                allowedChars += "a-zA-Z";
+            }
+
+            if (areIntegersAllowed)
+            {
+                allowedChars += "0-9";
+            }
+
+            if (areFullStopsAllowed)
+            {
+                allowedChars += "\\.";
+            }
+
+            if (areSpecialCharactersAllowed)
+            {
+                allowedChars += "!@#$%^&*()_+=\\[\\]{}|;:'\",<>/?`~\\-";
+            }
+
+            allowedChars += "\\s";
+
+            sentence = Regex.Replace(sentence, $"[^{allowedChars}]", "");
             sentence = Regex.Replace(sentence, @"\s+", " ");
             sentence = sentence.Trim();
 
